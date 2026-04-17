@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1612">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="성경">
+<title>현대어 성경</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- 상단 바 -->
+<header class="topbar">
+  <button class="icon-btn" id="btn-menu" aria-label="목차">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M3 6h18M3 12h18M3 18h18"/>
+    </svg>
+  </button>
+  <button class="title-btn" id="btn-ref">
+    <span id="current-ref">창세기 1장</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="chevron">
+      <path d="M6 9l6 6 6-6"/>
+    </svg>
+  </button>
+  <button class="icon-btn" id="btn-search" aria-label="검색">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="11" cy="11" r="7"/>
+      <path d="M21 21l-4.3-4.3"/>
+    </svg>
+  </button>
+</header>
+
+<!-- 본문 -->
+<main class="reader" id="reader">
+  <div class="reader-inner" id="reader-inner">
+    <div class="loading">불러오는 중...</div>
+  </div>
+</main>
+
+<!-- 하단 네비게이션 -->
+<nav class="bottom-nav">
+  <button class="nav-btn" id="btn-prev" aria-label="이전 장">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </button>
+  <button class="nav-btn" id="btn-bookmarks" aria-label="북마크">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M6 4h12v17l-6-4-6 4z"/>
+    </svg>
+  </button>
+  <button class="nav-btn" id="btn-settings" aria-label="설정">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+  </button>
+  <button class="nav-btn" id="btn-next" aria-label="다음 장">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- 목차 패널 -->
+<div class="sheet" id="sheet-toc" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel sheet-left">
+    <div class="sheet-header">
+      <h2>목차</h2>
+      <button class="icon-btn" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="ot">구약</button>
+      <button class="tab" data-tab="nt">신약</button>
+    </div>
+    <div class="book-list" id="book-list"></div>
+  </div>
+</div>
+
+<!-- 장 선택 패널 -->
+<div class="sheet" id="sheet-chapter" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel sheet-bottom">
+    <div class="sheet-header">
+      <h2 id="chapter-book-title">창세기</h2>
+      <button class="icon-btn" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="chapter-grid" id="chapter-grid"></div>
+  </div>
+</div>
+
+<!-- 검색 패널 -->
+<div class="sheet" id="sheet-search" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel sheet-full">
+    <div class="sheet-header">
+      <input type="search" id="search-input" placeholder="구절 검색 (예: 사랑, 요 3:16)" autocomplete="off">
+      <button class="icon-btn" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <p class="hint">두 글자 이상 입력하세요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 북마크 패널 -->
+<div class="sheet" id="sheet-bookmarks" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel sheet-bottom">
+    <div class="sheet-header">
+      <h2>북마크 · 하이라이트</h2>
+      <button class="icon-btn" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-btab="bookmarks">북마크</button>
+      <button class="tab" data-btab="highlights">하이라이트</button>
+    </div>
+    <div class="saved-list" id="saved-list"></div>
+  </div>
+</div>
+
+<!-- 설정 패널 -->
+<div class="sheet" id="sheet-settings" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel sheet-bottom">
+    <div class="sheet-header">
+      <h2>설정</h2>
+      <button class="icon-btn" data-close aria-label="닫기">✕</button>
+    </div>
+    <div class="settings">
+      <div class="setting-row">
+        <label>테마</label>
+        <div class="seg">
+          <button data-theme="light">밝게</button>
+          <button data-theme="sepia">세피아</button>
+          <button data-theme="dark">어둡게</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>글자 크기</label>
+        <div class="seg">
+          <button data-size="s">작게</button>
+          <button data-size="m">보통</button>
+          <button data-size="l">크게</button>
+          <button data-size="xl">매우 크게</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>글꼴</label>
+        <div class="seg">
+          <button data-font="serif">명조</button>
+          <button data-font="gowun">고운바탕</button>
+          <button data-font="sans">고딕</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>줄 간격</label>
+        <div class="seg">
+          <button data-lh="compact">좁게</button>
+          <button data-lh="normal">보통</button>
+          <button data-lh="loose">넓게</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 구절 액션 팝오버 -->
+<div class="verse-actions" id="verse-actions" hidden>
+  <button data-action="highlight-yellow" class="hl-btn hl-yellow" aria-label="노랑"></button>
+  <button data-action="highlight-green" class="hl-btn hl-green" aria-label="초록"></button>
+  <button data-action="highlight-blue" class="hl-btn hl-blue" aria-label="파랑"></button>
+  <button data-action="highlight-pink" class="hl-btn hl-pink" aria-label="분홍"></button>
+  <button data-action="highlight-clear" class="hl-btn hl-clear" aria-label="지우기">✕</button>
+  <div class="divider"></div>
+  <button data-action="bookmark" aria-label="북마크">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18">
+      <path d="M6 4h12v17l-6-4-6 4z"/>
+    </svg>
+  </button>
+  <button data-action="copy" aria-label="복사">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18">
+      <rect x="9" y="9" width="11" height="11" rx="1"/>
+      <path d="M5 15V5a1 1 0 011-1h10"/>
+    </svg>
+  </button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

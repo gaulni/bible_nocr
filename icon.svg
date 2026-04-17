@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1a1612"/>
+  <rect x="130" y="110" width="252" height="292" rx="8" fill="#f4ecd8"/>
+  <rect x="130" y="110" width="20" height="292" fill="#8a5a2b"/>
+  <line x1="180" y1="170" x2="360" y2="170" stroke="#6d645c" stroke-width="3"/>
+  <line x1="180" y1="210" x2="360" y2="210" stroke="#6d645c" stroke-width="3"/>
+  <line x1="180" y1="250" x2="330" y2="250" stroke="#6d645c" stroke-width="3"/>
+  <line x1="180" y1="300" x2="360" y2="300" stroke="#6d645c" stroke-width="3"/>
+  <line x1="180" y1="340" x2="340" y2="340" stroke="#6d645c" stroke-width="3"/>
+  <text x="256" y="430" text-anchor="middle" font-family="serif" font-size="38" font-weight="500" fill="#d4a56a">말씀</text>
+</svg>
