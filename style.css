@@ -314,6 +314,10 @@ input {
   display: none;
 }
 
+.verse-actions[hidden] {
+  display: none;
+}
+
 .sheet-backdrop {
   position: absolute;
   inset: 0;
