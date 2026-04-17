@@ -224,10 +224,12 @@ input {
 }
 
 .verse {
-  display: inline;
+  display: block;
   position: relative;
-  padding: 1px 0;
-  border-radius: 3px;
+  padding: 4px 6px;
+  margin: 2px -6px;
+  border-radius: 4px;
+  text-indent: 0;
   transition: background 0.2s;
 }
 
@@ -243,15 +245,16 @@ input {
 
 .verse-num {
   display: inline-block;
-  vertical-align: super;
-  font-size: var(--size-verse-num);
+  min-width: 1.6em;
+  vertical-align: baseline;
+  font-size: 0.78em;
   color: var(--verse-num);
-  font-weight: 600;
-  margin-right: 4px;
-  margin-left: 2px;
+  font-weight: 700;
+  margin-right: 6px;
   font-family: var(--font-sans);
   line-height: 1;
   user-select: none;
+  letter-spacing: 0;
 }
 
 .verse:first-child .verse-num { margin-left: 0; }
@@ -305,10 +308,6 @@ input {
   inset: 0;
   z-index: 100;
   display: flex;
-}
-
-.sheet[hidden] {
-  display: none;
 }
 
 .sheet-backdrop {

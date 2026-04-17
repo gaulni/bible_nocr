@@ -182,11 +182,11 @@ function renderChapter(book, chapter) {
     const classes = ['verse'];
     if (hlColor) classes.push(`hl-${hlColor}`);
     
-    html += `<span class="${classes.join(' ')}" data-verse="${v.v}" data-key="${k}">`;
+    html += `<div class="${classes.join(' ')}" data-verse="${v.v}" data-key="${k}">`;
     html += `<span class="verse-num">${v.v}</span>`;
     html += escapeHtml(v.t);
     if (isBookmark) html += '<span class="bookmark-mark"></span>';
-    html += '</span> ';
+    html += '</div>';
   });
 
   html += '</div>';
@@ -342,7 +342,7 @@ async function search(query) {
 // 저장된 항목 (북마크/하이라이트) 표시
 // ============================================
 
-function renderSavedList(type = 'bookmarks') {
+async function renderSavedList(type = 'bookmarks') {
   const list = document.getElementById('saved-list');
   const items = type === 'bookmarks' 
     ? Object.values(state.bookmarks)
@@ -355,34 +355,42 @@ function renderSavedList(type = 'bookmarks') {
 
   items.sort((a, b) => b.ts - a.ts);
   
-  // 각 구절의 본문을 찾기 위해 인덱스 필요
-  buildSearchIndex().then(index => {
-    const getVerse = (book, chap, verse) => {
-      const found = index.find(v => v.bookNum === book && v.chapter === chap && v.verse === verse);
-      return found ? found.text : '';
-    };
-    const getBookName = (num) => {
-      const b = state.books.find(bk => bk.num === num);
-      return b ? b.name : '';
-    };
-    
-    list.innerHTML = items.map(item => {
-      const text = getVerse(item.book, item.chap, item.verse);
-      const name = getBookName(item.book);
-      const colorDot = type === 'highlights' 
-        ? `<div class="hl-dot hl-${item.color}"></div>` 
-        : '';
-      return `
-        <button class="saved-item" data-goto="${item.book}-${item.chap}" data-verse="${item.verse}">
-          <div style="flex:1; min-width:0;">
-            <div class="ref">${name} ${item.chap}:${item.verse}</div>
-            <div class="snippet">${escapeHtml(text)}</div>
-          </div>
-          ${colorDot}
-        </button>
-      `;
-    }).join('');
-  });
+  // 필요한 책만 로드 (전체 성경 안 부름 → X 버튼 먹힘, 빠름)
+  const neededBooks = [...new Set(items.map(i => i.book))];
+  const loadedBooks = {};
+  await Promise.all(neededBooks.map(async (num) => {
+    loadedBooks[num] = await loadBookData(num);
+  }));
+  
+  const getVerse = (book, chap, verse) => {
+    const b = loadedBooks[book];
+    if (!b) return '';
+    const chapVerses = b.chapters[String(chap)];
+    if (!chapVerses) return '';
+    const found = chapVerses.find(v => v.v === verse);
+    return found ? found.t : '';
+  };
+  const getBookName = (num) => {
+    const b = state.books.find(bk => bk.num === num);
+    return b ? b.name : '';
+  };
+  
+  list.innerHTML = items.map(item => {
+    const text = getVerse(item.book, item.chap, item.verse);
+    const name = getBookName(item.book);
+    const colorDot = type === 'highlights' 
+      ? `<div class="hl-dot hl-${item.color}"></div>` 
+      : '';
+    return `
+      <button class="saved-item" data-goto="${item.book}-${item.chap}" data-verse="${item.verse}">
+        <div style="flex:1; min-width:0;">
+          <div class="ref">${name} ${item.chap}:${item.verse}</div>
+          <div class="snippet">${escapeHtml(text)}</div>
+        </div>
+        ${colorDot}
+      </button>
+    `;
+  }).join('');
 }
 
 // ============================================
@@ -528,6 +536,10 @@ function bindEvents() {
   document.getElementById('btn-next').onclick = () => navigate('next');
   document.getElementById('btn-bookmarks').onclick = () => {
     closeAllSheets();
+    // 항상 북마크 탭부터 시작
+    document.querySelectorAll('[data-btab]').forEach(t => t.classList.remove('active'));
+    const bookmarkTab = document.querySelector('[data-btab="bookmarks"]');
+    if (bookmarkTab) bookmarkTab.classList.add('active');
     renderSavedList('bookmarks');
     openSheet('sheet-bookmarks');
   };
