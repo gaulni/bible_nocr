@@ -1,5 +1,5 @@
 // 현대어 성경 PWA - 서비스 워커
-const CACHE_NAME = 'bible-v1';
+const CACHE_NAME = 'bible-v2';
 const CORE = [
   './',
   './index.html',
